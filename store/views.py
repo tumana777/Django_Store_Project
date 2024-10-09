@@ -1,17 +1,38 @@
 from django.http import JsonResponse
-from django.shortcuts import render, HttpResponse, get_object_or_404
-from .models import Product
+from .models import Category, Product
+from django.utils import timezone
+
+def category_list(request):
+    categories = Category.objects.all()
+
+    category_json = [
+        {
+            "ID": category.id,
+            "Name": category.name,
+            "Parent": {"ID": category.parent.id,
+                       "Name": category.parent.name} if category.parent else "No Parent Category"
+        }
+        for category in categories
+    ]
+
+    return JsonResponse({"Categories": category_json})
 
 def product_list(request):
-    products = [f"id: {str(product.pk)} - {product.name}" for product in Product.objects.all()]
-    return HttpResponse(f"<h3>Here are all products in store({len(products)}):</h3>\n{'; '.join(products)}")
+    products = Product.objects.all()
 
-def product_detail(request, product_id):
-    product = get_object_or_404(Product, pk=product_id)
-    return JsonResponse(
+    product_json = [
         {
-            "name": product.name,
-            "price": product.price,
-            "quantity": product.quantity
+            "ID": product.id,
+            "Name": product.name,
+            "Description": product.description,
+            "Price": product.price,
+            "Quantity": product.quantity,
+            "Created": timezone.localtime(product.created_at).strftime("%Y-%m-%d %H:%M:%S"),
+            "Updated": timezone.localtime(product.updated_at).strftime("%Y-%m-%d %H:%M:%S"),
+            "Category": [category.name for category in product.category.all()],
+            "Image URL": request.build_absolute_uri(product.image.url) if product.image else "No Image"
         }
-    )
+        for product in products
+    ]
+
+    return JsonResponse({"Products": product_json})
