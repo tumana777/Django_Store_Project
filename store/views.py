@@ -30,7 +30,7 @@ def product_list(request):
             "Created": timezone.localtime(product.created_at).strftime("%Y-%m-%d %H:%M:%S"),
             "Updated": timezone.localtime(product.updated_at).strftime("%Y-%m-%d %H:%M:%S"),
             "Categories": [{"ID": category.id, "Name": category.name} for category in product.category.all()],
-            "Image URL": request.build_absolute_uri(product.image.url) if product.image else "No Image"
+            "Image URL": request.build_absolute_uri(product.image.url) if product.image else None
         }
         for product in products
     ]
