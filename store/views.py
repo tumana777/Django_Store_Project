@@ -10,7 +10,7 @@ def category_list(request):
             "ID": category.id,
             "Name": category.name,
             "Parent": {"ID": category.parent.id,
-                       "Name": category.parent.name} if category.parent else "No Parent Category"
+                       "Name": category.parent.name} if category.parent else None,
         }
         for category in categories
     ]
@@ -29,7 +29,7 @@ def product_list(request):
             "Quantity": product.quantity,
             "Created": timezone.localtime(product.created_at).strftime("%Y-%m-%d %H:%M:%S"),
             "Updated": timezone.localtime(product.updated_at).strftime("%Y-%m-%d %H:%M:%S"),
-            "Category": [category.name for category in product.category.all()],
+            "Categories": [{"ID": category.id, "Name": category.name} for category in product.category.all()],
             "Image URL": request.build_absolute_uri(product.image.url) if product.image else "No Image"
         }
         for product in products
