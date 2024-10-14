@@ -1,12 +1,17 @@
 from django.db import models
+from mptt.models import MPTTModel, TreeForeignKey
 
-class Category(models.Model):
+
+class Category(MPTTModel):
     name = models.CharField(max_length=255)
-    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE)
+    parent = TreeForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
 
     class Meta:
         db_table = 'category'
         verbose_name_plural = 'category'
+
+    class MPTTMeta:
+        order_insertion_by = ['name']
 
     def __str__(self):
         if self.parent:

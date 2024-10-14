@@ -1,38 +1,38 @@
-from django.http import JsonResponse
+from django.shortcuts import render
 from .models import Category, Product
-from django.utils import timezone
+from django.db.models import F, Max
+
 
 def category_list(request):
-    categories = Category.objects.all()
+    categories = Category.objects.filter(parent=None)
 
-    category_json = [
-        {
-            "ID": category.id,
-            "Name": category.name,
-            "Parent": {"ID": category.parent.id,
-                       "Name": category.parent.name} if category.parent else None,
-        }
-        for category in categories
-    ]
+    for category in categories:
+        all_categories = category.get_descendants(include_self=True)
+        products_count = Product.objects.filter(category__in=all_categories).count()
+        category.products_count = products_count
 
-    return JsonResponse({"Categories": category_json})
+    return render(request, 'categories.html', {"categories": categories})
 
-def product_list(request):
-    products = Product.objects.all()
+def product_list(request, category_id):
+    main_category = Category.objects.get(id=category_id)
 
-    product_json = [
-        {
-            "ID": product.id,
-            "Name": product.name,
-            "Description": product.description,
-            "Price": product.price,
-            "Quantity": product.quantity,
-            "Created": timezone.localtime(product.created_at).strftime("%Y-%m-%d %H:%M:%S"),
-            "Updated": timezone.localtime(product.updated_at).strftime("%Y-%m-%d %H:%M:%S"),
-            "Categories": [{"ID": category.id, "Name": category.name} for category in product.category.all()],
-            "Image URL": request.build_absolute_uri(product.image.url) if product.image else None
-        }
-        for product in products
-    ]
+    all_categories = main_category.get_descendants(include_self=True)
 
-    return JsonResponse({"Products": product_json})
+    products = (Product.objects.filter(category__in=all_categories)
+                .prefetch_related('category').distinct()
+                .annotate(total=F('quantity') * F('price')))
+
+    most_expensive = products.order_by('-price').first()
+    cheaper = products.order_by('price').first()
+
+    context = {
+        'products': products,
+        'most_expensive': most_expensive,
+    }
+
+
+    return render(request, 'products.html', context)
+
+def product_detail(request, product_id):
+    product = Product.objects.get(id=product_id)
+    return render(request, 'product_detail.html', {"product": product})
