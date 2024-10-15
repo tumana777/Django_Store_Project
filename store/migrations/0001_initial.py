@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('quantity', models.IntegerField()),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('image', models.ImageField(blank=True, null=True, upload_to='products')),
+                ('image', models.ImageField(blank=True, null=True, upload_to='product_images')),
                 ('category', models.ManyToManyField(to='store.category')),
             ],
             options={

@@ -6,8 +6,11 @@
 </head>
 <body>
     {% for product in products %}
-        <p><a href="{% url 'product_detail' product.id %}">{{product.name}}</a> - Total Price: {{product.total}}</p>
+        <p><a href="{% url 'product_detail' product.id %}">{{ product.name }}</a> - Total Price: ${{ product.total }}</p>
     {% endfor %}
-    <h3>Most Expensive Product: {{most_expensive.name}}, Price: {{most_expensive.price}}</h3>
+    <h3>Most Expensive Product's Price: ${{ stats.max_price|floatformat:2 }}</h3>
+    <h3>The Cheapest Product's Price: ${{ stats.min_price|floatformat:2 }}</h3>
+    <h3>Products Average Price: ${{ stats.avg_price|floatformat:2 }}</h3>
+    <h3>Products Total Price Sum: ${{ stats.total_sum|floatformat:2 }}</h3>
 </body>
 </html>

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Category, Product
-from django.db.models import F, Max
+from django.db.models import F, Max, Avg, Min, Sum
 
 
 def category_list(request):
@@ -22,12 +22,17 @@ def product_list(request, category_id):
                 .prefetch_related('category').distinct()
                 .annotate(total=F('quantity') * F('price')))
 
-    most_expensive = products.order_by('-price').first()
-    cheaper = products.order_by('price').first()
+    for product in products:
+        print(product.total)
+
+    stats = products.aggregate(max_price=Max('price'),
+                               min_price=Min('price'),
+                               avg_price=Avg('price'),
+                               total_sum=Sum(F('quantity') * F('price')))
 
     context = {
         'products': products,
-        'most_expensive': most_expensive,
+        'stats': stats,
     }
 
 
