@@ -1,12 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Categories</title>
-</head>
-<body>
-    {% for category in categories %}
-        <h3><a href="{% url 'product_list' category.id %}">{{category.name}}({{category.products_count}})</a></h3>
-    {% endfor %}
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %} Categories {% endblock %}
+{% block content %}
+    <h1 class="mb-4 text-center">Categories</h1>
+    <div class="row">
+        {% for category in categories %}
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'product_list' category.id %}" class="text-decoration-none">
+                                {{ category.name }}
+                            </a>
+                            <span class="badge bg-secondary ms-2">{{ category.products_count }}</span>
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
