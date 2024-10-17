@@ -40,7 +40,10 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'store',
     'order',
+    'user'
 ]
+
+AUTH_USER_MODEL = 'user.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
